@@ -3,7 +3,7 @@
    - 静态资源：缓存优先，断网可用
    - 打卡数据保存在 localStorage，与本缓存无关，更新版本不会清除记录
    - 改版时把 CACHE_VERSION 加 1 即可让旧缓存整体失效 */
-const CACHE_VERSION = 'workout-tracker-v1';
+const CACHE_VERSION = 'workout-tracker-v2';
 const APP_SHELL = [
   './',
   './index.html',
