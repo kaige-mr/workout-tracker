@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f7f8fb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="训练打卡">
+<title>每周三练 · 增肌打卡计划表</title>
+<style>
+  :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color:#202733; background:#f7f8fb; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px 14px 42px; }
+  .sheet { max-width:760px; margin:auto; }
+  header { margin-bottom:22px; }
+  .eyebrow { font-size:12px; font-weight:700; letter-spacing:.12em; color:#587a8b; }
+  h1 { font-size:clamp(26px,6vw,34px); letter-spacing:-.035em; line-height:1.23; margin:7px 0 9px; }
+  .sub { color:#637084; margin:0; font-size:14px; line-height:1.7; }
+  .summary { display:flex; flex-wrap:wrap; gap:7px; margin:17px 0 21px; }
+  .pill { border:1px solid #e0e7ee; background:#fff; border-radius:100px; padding:7px 11px; font-size:12px; color:#495b6c; font-weight:600; }
+  .day { background:white; border:1px solid #e5eaf0; border-radius:16px; overflow:hidden; margin:0 0 13px; box-shadow:0 3px 12px rgba(32,45,64,.035); }
+  .daytop { display:flex; align-items:center; padding:17px 18px; gap:12px; border-bottom:1px solid #edf0f4; }
+  .daymark { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:46px; height:46px; border-radius:12px; color:#fff; font-size:14px; font-weight:800; background:#225d75; }
+  .d-wed .daymark { background:#536a8b; }
+  .d-fri .daymark { background:#3f7770; }
+  h2 { font-size:18px; margin:0 0 3px; letter-spacing:-.01em; }
+  .focus { margin:0; color:#7a8492; font-size:12px; }
+  table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:14px; }
+  th { color:#8892a0; font-size:11px; letter-spacing:.04em; font-weight:700; text-align:left; background:#fafbfc; }
+  th, td { padding:13px 18px; }
+  th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3) { text-align:center; white-space:nowrap; }
+  th:nth-child(1) { width:54%; }
+  th:nth-child(2) { width:20%; }
+  th:nth-child(3) { width:26%; }
+  tbody tr + tr { border-top:1px solid #edf0f4; }
+  .move { font-weight:600; }
+  .number { font-variant-numeric: tabular-nums; font-weight:650; }
+  .rest { background:#fff; border:1px solid #e5eaf0; border-radius:14px; padding:14px 18px; line-height:1.8; margin-top:17px; font-size:13px; color:#586675; }
+  .rest strong { color:#2d3b49; }
+  .tiny { color:#8a94a1; font-size:12px; line-height:1.65; margin:12px 4px; }
+  @media (max-width:410px) {
+    body { padding:18px 10px 30px; }
+    .daytop { padding:14px; }
+    th,td { padding:12px 10px; }
+    .daymark { width:42px;height:42px; }
+    .move { font-size:13px; }
+    th:nth-child(1) { width:53%; }
+    th:nth-child(2) { width:17%; }
+    th:nth-child(3) { width:30%; }
+  }
+  @media print {
+    :root { background:#fff; }
+    @page { size:A4; margin:13mm; }
+    body { padding:0; background:white; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+    .sheet { max-width:none; }
+    header { margin-bottom:13px; }
+    h1 { font-size:27px; }
+    .summary { margin:10px 0 13px; }
+    .day { break-inside:avoid; margin-bottom:9px; box-shadow:none; }
+    .daytop { padding:12px 15px; }
+    th,td { padding:9px 15px; }
+    .rest { margin-top:9px; }
+  }
+
+  .dashboard {background:#fff;border:1px solid #e3eaf0;border-radius:18px;padding:18px;margin:0 0 18px;box-shadow:0 3px 12px rgba(32,45,64,.035)}
+  .headrow,.calhead,.dayfooter{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .dash-title{font-size:18px;margin:0}.muted{font-size:12px;color:#788696;line-height:1.6}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+  .stat{background:#f5f7fa;border-radius:12px;padding:12px 9px;text-align:center}.stat strong{font-size:23px;display:block;font-variant-numeric:tabular-nums}.stat span{font-size:11px;color:#728091}
+  button{font:inherit;cursor:pointer;border:0}button:focus-visible{outline:3px solid #72a9c7;outline-offset:2px}
+  .navbtn{background:#f2f5f8;border:1px solid #e5eaf0;border-radius:10px;width:36px;height:34px;font-size:22px;color:#41556b}
+  .calmonth{font-size:15px;font-weight:750}.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:12px}
+  .weekday{text-align:center;font-size:11px;color:#8a96a3;padding:5px 0}
+  .cell{min-height:51px;border-radius:10px;border:1px solid transparent;background:#f6f8fa;color:#5d6a7a;padding:6px 2px;display:flex;align-items:center;flex-direction:column;gap:4px}
+  .cell.blank{background:transparent}.cell .num{font-size:12px;font-weight:650}.cell .mark{font-size:11px;white-space:nowrap}
+  .cell.workout{background:#eef4f8;color:#225d75;border-color:#dce9f1}.cell.completed{background:#e5f5ed;border-color:#a9ddc3;color:#1c7b50}
+  .cell.today{outline:2px solid #6689a3;outline-offset:1px}.cell.pastnot .mark{color:#9aa5b1}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:13px 0 0;font-size:11px;color:#748292}.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;background:#dce9f1}.dot.yes{background:#9ed7b8}
+  .hint{background:#f5f8fa;padding:10px 12px;border-radius:10px;font-size:12px;color:#6f7c8c;margin-top:13px;line-height:1.6}
+  .dayfooter{padding:12px 15px;border-top:1px solid #edf0f4;flex-wrap:wrap}.datehint{font-size:12px;color:#718092}
+  .checkbtn{border-radius:10px;padding:10px 15px;color:white;background:#225d75;font-weight:700;font-size:13px;min-width:118px}.checkbtn.isdone{background:#e5f5ed;color:#16734b}
+  .backups{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.lightbtn{border:1px solid #dde5ee;background:#fff;border-radius:10px;padding:9px 12px;color:#4d5f70;font-size:12px;font-weight:600}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#26394b;color:#fff;padding:10px 16px;border-radius:11px;font-size:13px;box-shadow:0 6px 20px #0002;z-index:10;display:none}
+  @media print {.dashboard,.dayfooter,.backups{display:none!important}}
+</style>
+</head>
+<body>
+<main class="sheet">
+  <header>
+    <div class="eyebrow">MY WEEKLY WORKOUT</div>
+    <h1>每周三练 · 增肌打卡计划表</h1>
+    <p class="sub">按你现在的情况更新：每周 3 次，每次练 2 个部位，每次只保留 3 个动作；以增肌为主，兼顾简单和好坚持。</p>
+    <div class="summary"><span class="pill">周一 / 周三 / 周五</span><span class="pill">每次约 45–60 分钟</span><span class="pill">半年基础版</span></div>
+  </header>
+
+  <section class="dashboard" aria-label="训练打卡日历">
+    <div class="headrow"><div><h2 class="dash-title">训练打卡</h2><div class="muted">点选日历里的训练日，或者下方按钮，即可打卡或取消。</div></div><span class="pill">本地保存</span></div>
+    <div class="stats">
+      <div class="stat"><strong id="weekDone">0/3</strong><span>本周完成</span></div>
+      <div class="stat"><strong id="monthDone">0</strong><span>本月打卡</span></div>
+      <div class="stat"><strong id="allDone">0</strong><span>累计打卡</span></div>
+    </div>
+    <div class="calhead"><button class="navbtn" id="prevMonth" aria-label="上个月">‹</button><div class="calmonth" id="monthTitle"></div><button class="navbtn" id="nextMonth" aria-label="下个月">›</button></div>
+    <div class="cal" id="calendar" aria-label="每月训练日历"></div>
+    <div class="legend"><span><i class="dot"></i>计划训练日</span><span><i class="dot yes"></i>已完成</span></div>
+    <div class="hint" id="storageHint">每周一、三、五为计划训练日。日期到了也不会自动算完成，需你主动打卡。</div>
+    <div class="backups"><button class="lightbtn" id="exportBtn">导出打卡备份</button><button class="lightbtn" id="importBtn">导入备份</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+    <p class="muted">记录一般保存在当前浏览器中；更换手机、浏览器或清除浏览数据时可能丢失，建议偶尔导出备份。</p>
+  </section>
+
+  <section class="day d-mon" aria-label="周一训练">
+    <div class="daytop"><div class="daymark">周一</div><div><h2>胸部 + 三头肌</h2><p class="focus">训练 A · 胸部主练，三头辅助</p></div></div>
+    <table><thead><tr><th>训练动作</th><th>组数</th><th>每组次数</th></tr></thead><tbody>
+      <tr><td class="move">坐姿器械推胸</td><td class="number">4 组</td><td class="number">8–12 次</td></tr>
+      <tr><td class="move">上斜哑铃卧推</td><td class="number">4 组</td><td class="number">8–12 次</td></tr>
+      <tr><td class="move">绳索三头肌下压</td><td class="number">3 组</td><td class="number">10–15 次</td></tr>
+    </tbody></table><div class="dayfooter"><span class="datehint" data-date-hint="0"></span><button class="checkbtn" data-check-weekday="0">✓ 完成这次训练</button></div>
+  </section>
+
+  <section class="day d-wed" aria-label="周三训练">
+    <div class="daytop"><div class="daymark">周三</div><div><h2>背部 + 二头肌</h2><p class="focus">训练 B · 背部主练，二头辅助</p></div></div>
+    <table><thead><tr><th>训练动作</th><th>组数</th><th>每组次数</th></tr></thead><tbody>
+      <tr><td class="move">高位下拉</td><td class="number">4 组</td><td class="number">8–12 次</td></tr>
+      <tr><td class="move">坐姿划船</td><td class="number">4 组</td><td class="number">8–12 次</td></tr>
+      <tr><td class="move">哑铃弯举</td><td class="number">3 组</td><td class="number">10–15 次</td></tr>
+    </tbody></table><div class="dayfooter"><span class="datehint" data-date-hint="2"></span><button class="checkbtn" data-check-weekday="2">✓ 完成这次训练</button></div>
+  </section>
+
+  <section class="day d-fri" aria-label="周五训练">
+    <div class="daytop"><div class="daymark">周五</div><div><h2>腿部 + 肩部</h2><p class="focus">训练 C · 腿部优先，肩部辅助</p></div></div>
+    <table><thead><tr><th>训练动作</th><th>组数</th><th>每组次数</th></tr></thead><tbody>
+      <tr><td class="move">坐姿腿举</td><td class="number">4 组</td><td class="number">10–12 次</td></tr>
+      <tr><td class="move">罗马尼亚硬拉</td><td class="number">4 组</td><td class="number">8–12 次</td></tr>
+      <tr><td class="move">器械肩推</td><td class="number">3 组</td><td class="number">8–12 次</td></tr>
+    </tbody></table><div class="dayfooter"><span class="datehint" data-date-hint="4"></span><button class="checkbtn" data-check-weekday="4">✓ 完成这次训练</button></div>
+  </section>
+
+  <div class="rest"><strong>休息日：</strong>周二、周四、周六、周日。可轻松散步或拉伸。<br><strong>训练提醒：</strong>先热身 5–10 分钟；大动作组间休息 90–150 秒，小动作休息 60–90 秒；每组做到还剩 1–3 次余力。若某动作全部组都稳定达到次数上限，下次小幅加重量。</div>
+  <p class="tiny">这版更适合你目前“有半年自己训练经历、想继续增肌、但又想保持简单”的情况。若连续 3–4 周重量和次数都无进步，再考虑增加训练量。</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const KEY='simple_gym_checkins_v1';
+  const workoutNames={1:'胸 + 三头',3:'背 + 二头',5:'腿 + 肩'};
+  const now=new Date(); now.setHours(12,0,0,0);
+  let shown=new Date(now.getFullYear(),now.getMonth(),1,12);
+  let records={}; let storageOk=true;
+  const $=id=>document.getElementById(id);
+  const pad=n=>String(n).padStart(2,'0');
+  const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const weekday=d=>d.getDay();
+  function load(){try{const value=localStorage.getItem(KEY);if(value){const data=JSON.parse(value);if(data&&typeof data==='object'&&!Array.isArray(data))records=data;}}catch(e){storageOk=false;}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(records));storageOk=true;}catch(e){storageOk=false;} if(!storageOk)$('storageHint').textContent='当前浏览器未允许本地存储，打卡可能无法在关闭后保留。建议改用 Chrome 浏览器打开，并导出备份。';}
+  const mondayOf=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);x.setDate(x.getDate()-(x.getDay()+6)%7);return x;};
+  function weekDate(dayIndex){const x=mondayOf(now);x.setDate(x.getDate()+dayIndex);return x;}
+  function notify(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(notify.timer);notify.timer=setTimeout(()=>t.style.display='none',1800);}
+  function toggle(d){if(!workoutNames[weekday(d)])return;const k=key(d);if(records[k]){delete records[k];notify('已取消 '+k+' 的打卡');}else{records[k]=true;notify('已记录 '+k+' 的训练 ✓');}save();render();}
+  function render(){
+    const wk=mondayOf(now), end=new Date(wk);end.setDate(end.getDate()+6);
+    const inWeek=Object.keys(records).filter(k=>records[k]&&k>=key(wk)&&k<=key(end)).length;
+    $('weekDone').textContent=`${inWeek}/3`;
+    const prefix=`${shown.getFullYear()}-${pad(shown.getMonth()+1)}-`;
+    $('monthDone').textContent=Object.keys(records).filter(k=>records[k]&&k.startsWith(prefix)).length;
+    $('allDone').textContent=Object.values(records).filter(Boolean).length;
+    $('monthTitle').textContent=`${shown.getFullYear()} 年 ${shown.getMonth()+1} 月`;
+    const cal=$('calendar');cal.innerHTML='';
+    ['一','二','三','四','五','六','日'].forEach(n=>{const el=document.createElement('div');el.className='weekday';el.textContent=n;cal.append(el);});
+    const first=new Date(shown.getFullYear(),shown.getMonth(),1,12);
+    const leading=(first.getDay()+6)%7;
+    for(let i=0;i<leading;i++){const blank=document.createElement('div');blank.className='cell blank';cal.append(blank);}
+    const max=new Date(shown.getFullYear(),shown.getMonth()+1,0).getDate();
+    for(let i=1;i<=max;i++){
+      const d=new Date(shown.getFullYear(),shown.getMonth(),i,12), planned=!!workoutNames[weekday(d)], done=!!records[key(d)];
+      const el=document.createElement(planned?'button':'div');
+      el.className='cell'+(planned?' workout':'')+(done?' completed':'')+(key(d)===key(now)?' today':'')+(planned&&!done&&d<now?' pastnot':'');
+      const n=document.createElement('span');n.className='num';n.textContent=i;el.append(n);
+      const m=document.createElement('span');m.className='mark';m.textContent=done?'✓ 完成':planned?('· '+({1:'胸',3:'背',5:'腿'}[weekday(d)])):'';el.append(m);
+      if(planned){el.type='button';el.setAttribute('aria-label',`${key(d)} ${workoutNames[weekday(d)]} ${done?'取消打卡':'打卡'}`);el.setAttribute('aria-pressed',String(done));el.addEventListener('click',()=>toggle(d));}
+      cal.append(el);
+    }
+    document.querySelectorAll('[data-check-weekday]').forEach(btn=>{
+      const d=weekDate(Number(btn.dataset.checkWeekday));const done=!!records[key(d)];
+      btn.textContent=done?'✓ 已完成 · 点击取消':'✓ 完成这次训练';btn.classList.toggle('isdone',done);
+      btn.setAttribute('aria-pressed',String(done));btn.onclick=()=>toggle(d);
+      btn.parentElement.querySelector('.datehint').textContent=`本周 ${pad(d.getMonth()+1)}/${pad(d.getDate())} · ${done?'已经打卡':'尚未打卡'}`;
+    });
+  }
+  $('prevMonth').onclick=()=>{shown=new Date(shown.getFullYear(),shown.getMonth()-1,1,12);render();};
+  $('nextMonth').onclick=()=>{shown=new Date(shown.getFullYear(),shown.getMonth()+1,1,12);render();};
+  $('exportBtn').onclick=()=>{
+    const blob=new Blob([JSON.stringify({format:'gym-checkins-v1',records},null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`增肌打卡备份_${key(now)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  };
+  $('importBtn').onclick=()=>$('importFile').click();
+  $('importFile').onchange=async e=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    try{const data=JSON.parse(await f.text());if(data.format!=='gym-checkins-v1'||!data.records||typeof data.records!=='object'||Array.isArray(data.records))throw Error('文件格式不匹配');
+      const valid=Object.entries(data.records).filter(([k,v])=>/^\d{4}-\d{2}-\d{2}$/.test(k)&&v===true);
+      records={...records,...Object.fromEntries(valid)};save();render();notify(`已导入 ${valid.length} 条记录`);
+    }catch(err){alert('导入失败：请选用本页面导出的 JSON 备份文件。');}
+    e.target.value='';
+  };
+  load();render();
+})();
+</script>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* PWA: 注册 Service Worker；新版本就绪后自动刷新一次（打卡数据存在 localStorage，不受影响） */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    var hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      if (reg && reg.update) reg.update();
+    }).catch(function () {});
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hadController || refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+  });
+}
+</script>
+</body>
+</html>
