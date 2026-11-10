@@ -88,6 +88,26 @@
   .backups{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.lightbtn{border:1px solid #dde5ee;background:#fff;border-radius:10px;padding:9px 12px;color:#4d5f70;font-size:12px;font-weight:600}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#26394b;color:#fff;padding:10px 16px;border-radius:11px;font-size:13px;box-shadow:0 6px 20px #0002;z-index:10;display:none}
   @media print {.dashboard,.dayfooter,.backups{display:none!important}}
+
+  /* 动作与拉伸指导：按需展开、离线可用 */
+  .move-trigger{width:100%;padding:0;border:0;background:transparent;color:#225d75;font-weight:700;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:6px;line-height:1.5}
+  .move-trigger .chev,.stretch-toggle .chev{font-size:17px;transition:transform .2s ease;color:#7b8c9e}
+  .move-trigger[aria-expanded="true"] .chev,.stretch-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .guide-row td{padding:0 13px 12px!important;background:#fafcff}
+  .guide-panel{padding:13px 12px;border:1px solid #e2e9f1;background:#fff;border-radius:12px;font-size:13px;line-height:1.7;color:#405061}
+  .guide-visual{display:flex;align-items:center;justify-content:center;min-height:132px;border-radius:10px;background:#f1f6f9;margin-bottom:12px;overflow:hidden}
+  .guide-visual svg{display:block;width:100%;max-width:320px;height:135px}
+  .guide-meta{font-size:12px;color:#38677d;font-weight:700;margin-bottom:7px}
+  .guide-panel p{margin:5px 0}.guide-panel strong{color:#253e51}
+  .stretch-wrap{border-top:1px solid #edf0f4;padding:13px 15px}
+  .stretch-toggle{width:100%;background:#f4f7f9;border:1px solid #e7edf3;padding:12px;border-radius:11px;text-align:left;display:flex;align-items:center;justify-content:space-between;color:#29475b;font-size:14px;font-weight:750}
+  .stretch-content{padding:8px 2px 1px}.stretch-item{border-bottom:1px solid #edf0f4;padding:10px 5px}.stretch-item:last-child{border:0}
+  .stretch-name{font-size:13px;font-weight:750;color:#304b5c}.stretch-text{font-size:12px;color:#677686;line-height:1.7;margin-top:4px}
+  .stretch-icon{width:30px;height:30px;flex-shrink:0;border-radius:9px;background:#eaf2f7;display:flex;align-items:center;justify-content:center;color:#38677d}
+  .stretch-inner{display:flex;gap:10px;align-items:flex-start}
+  .guide-note{font-size:11px;color:#80909c;margin:6px 0}
+  @media print {.guide-row,.stretch-wrap{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -212,6 +232,82 @@
 })();
 </script>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+<script>
+/* 独立于打卡状态的静态指导，保持原 localStorage 结构不变 */
+(function(){
+'use strict';
+const guides={
+ '坐姿器械推胸':{part:'胸大肌、肱三头肌',type:'press',steps:'调整座椅，让握把约在胸部中线；背部贴靠垫，双脚踩稳；向前推至手臂接近伸直，再缓慢还原。',cue:'肩胛保持稳定，手腕尽量中立，推起时呼气。',avoid:'不要耸肩、猛撞配重或把肘完全锁死。'},
+ '上斜哑铃卧推':{part:'胸大肌上部、三头肌',type:'incline',steps:'将凳子调整到约 15–30°；双脚踩稳，哑铃位于上胸两侧；向上推举，控制下降。',cue:'前臂尽量竖直，下落时吸气，上推时呼气。',avoid:'凳子角度过高、腰部过度反弓、双臂突然向下坠落。'},
+ '绳索三头肌下压':{part:'肱三头肌',type:'pushdown',steps:'滑轮调至高位，身体稳定站立；上臂贴近躯干，向下伸直肘部；缓慢回到前臂约水平的位置。',cue:'上臂少晃动，向下伸肘时呼气。',avoid:'身体大幅前后摆动、借惯性下压。'},
+ '高位下拉':{part:'背阔肌、肱二头肌',type:'pulldown',steps:'固定大腿、握距略宽于肩；挺胸，让肘部朝身体两侧向下移动；把握把拉向上胸，再慢慢放回。',cue:'想象用肘向下拉；拉下时呼气。',avoid:'拉到颈后、过度后仰或猛甩重量。'},
+ '坐姿划船':{part:'中背、背阔肌、肱二头肌',type:'row',steps:'坐稳、胸廓自然挺起；将把手拉向肚脐附近，肘部往后；受控伸臂还原。',cue:'先稳定躯干，拉回时呼气。',avoid:'腰背反复大幅前后晃动、肩膀耸起。'},
+ '哑铃弯举':{part:'肱二头肌',type:'curl',steps:'双脚站稳、哑铃自然垂于身侧；保持上臂相对固定，屈肘抬起；缓慢下降。',cue:'上举呼气、下降吸气，手腕保持自然。',avoid:'甩腰、耸肩、靠惯性把重量弹上去。'},
+ '坐姿腿举':{part:'股四头肌、臀部',type:'legpress',steps:'调整座椅让腰背贴稳，双脚与肩同宽踩平台；屈膝下降至舒适深度；用脚掌均匀发力推回。',cue:'膝盖跟随脚尖方向，推起时呼气。',avoid:'膝盖内扣、臀部离开座椅、锁死膝关节。'},
+ '罗马尼亚硬拉':{part:'腘绳肌、臀大肌',type:'hinge',steps:'双脚与髋同宽，膝盖微屈；臀部向后推，让重量沿腿部下降；感到大腿后侧拉伸后，夹臀站起。',cue:'脊柱维持自然位置，站起时呼气；先轻重量练习。',avoid:'含胸弓腰、把动作做成深蹲、用腰猛拉重量。'},
+ '器械肩推':{part:'三角肌、肱三头肌',type:'shoulder',steps:'调整座椅，让握把位于肩部附近；背部贴稳，向上推至手臂接近伸直；缓慢下降。',cue:'手腕与前臂对齐，推起时呼气。',avoid:'耸肩、过度挺腰或让肩关节出现刺痛。'}
+};
+const stretches={
+ mon:[
+ ['门框胸肌拉伸','胸大肌','前臂扶住门框，身体轻轻向前转，胸前有轻微牵拉感即可。'],
+ ['头顶三头肌拉伸','肱三头肌','一臂举过头顶并屈肘，用另一手轻扶肘部，不要强拉。'],
+ ['肩前侧舒展','肩前侧','双手在身后轻轻交握，向后打开胸廓，肩部保持放松。']],
+ wed:[
+ ['扶墙背阔肌拉伸','背阔肌','双手扶固定支撑物，臀部向后坐，让背部侧面轻轻拉长。'],
+ ['二头肌轻度拉伸','肱二头肌','手臂向身体侧后方伸直、掌心向外，身体轻轻转向另一侧。'],
+ ['抱胸上背拉伸','上背部','双臂前伸相抱，轻轻圆上背，呼吸保持自然。']],
+ fri:[
+ ['站姿股四头肌拉伸','大腿前侧','扶墙站稳，握住同侧脚踝向臀部靠近，双膝尽量并拢。'],
+ ['腘绳肌拉伸','大腿后侧','一脚向前伸、脚跟着地，髋部向后折叠、背部保持自然。'],
+ ['仰卧四字臀部拉伸','臀部','仰卧，一脚踝搭在对侧膝上，将下方大腿轻轻拉向身体。'],
+ ['横向肩部拉伸','肩后侧','一只手臂横过胸前，另一手轻扶上臂向胸前靠近。']]
+};
+const poses={
+ press:[['line',78,65,78,113],['line',78,76,111,76],['line',111,76,126,64],['line',126,64,148,64],['rect',150,50,10,28],['line',78,111,115,111],['line',115,111,126,123]],
+ incline:[['line',62,107,131,73],['line',95,90,115,62],['line',115,62,142,35],['rect',145,28,23,8],['line',96,90,126,119]],
+ pushdown:[['line',112,20,112,49],['line',112,49,135,70],['line',135,70,135,115],['line',135,70,113,82],['line',113,82,116,112],['rect',107,7,10,9]],
+ pulldown:[['line',78,25,166,25],['line',122,25,122,44],['line',122,44,95,75],['line',95,75,107,102],['line',122,44,148,75],['line',148,75,140,103],['line',105,101,145,101]],
+ row:[['line',52,100,123,100],['line',123,100,151,80],['line',151,80,180,80],['line',75,83,112,83],['line',112,83,130,93]],
+ curl:[['line',102,36,102,88],['line',102,53,83,74],['line',83,74,94,91],['line',102,53,126,75],['line',126,75,137,51],['rect',130,43,17,9]],
+ legpress:[['line',55,112,95,87],['line',95,87,120,105],['line',120,105,163,56],['rect',169,27,10,84],['line',55,112,115,112]],
+ hinge:[['line',107,31,125,73],['line',125,73,92,94],['line',125,73,145,109],['line',92,94,91,120],['line',145,109,151,125],['rect',66,100,95,7]],
+ shoulder:[['line',117,40,117,90],['line',117,50,88,34],['line',88,34,86,13],['line',117,50,146,34],['line',146,34,148,13],['rect',77,9,80,8]],
+};
+function diagram(type,label){
+ const a=poses[type]||[];const figures=a.map(p=>p[0]==='rect'?'<rect x="'+p[1]+'" y="'+p[2]+'" width="'+p[3]+'" height="'+p[4]+'" rx="3"/>':'<line x1="'+p[1]+'" y1="'+p[2]+'" x2="'+p[3]+'" y2="'+p[4]+'"/>').join('');
+ return '<svg viewBox="0 0 240 142" role="img" aria-label="'+label+'的简化动作方向示意"><g fill="none" stroke="#4d8194" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">'+figures+'</g><circle cx="117" cy="21" r="10" fill="#d0e4eb" stroke="#4d8194" stroke-width="3"/><path d="M180 120 H214" stroke="#88a7b4" stroke-width="2"/><path d="M209 115 L215 120 L209 125" fill="none" stroke="#88a7b4" stroke-width="2"/><text x="120" y="136" font-size="10" text-anchor="middle" fill="#688496">简化示意 · 以实际器械姿势为准</text></svg>';
+}
+document.querySelectorAll('.day').forEach((card,dayIndex)=>{
+ const dayKey=['mon','wed','fri'][dayIndex];
+ const rows=Array.from(card.querySelectorAll('tbody tr'));
+ rows.forEach((tr,i)=>{
+  const cell=tr.querySelector('.move');if(!cell)return;
+  const name=cell.textContent.trim(),g=guides[name];if(!g)return;
+  const id='guide-'+dayIndex+'-'+i;
+  const btn=document.createElement('button');btn.type='button';btn.className='move-trigger';btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls',id);
+  const title=document.createElement('span');title.textContent=name;const arrow=document.createElement('span');arrow.className='chev';arrow.textContent='⌄';btn.append(title,arrow);cell.replaceChildren(btn);
+  const detail=document.createElement('tr');detail.className='guide-row';detail.id=id;detail.hidden=true;
+  const td=document.createElement('td');td.colSpan=3;const panel=document.createElement('div');panel.className='guide-panel';
+  panel.innerHTML='<div class="guide-visual">'+diagram(g.type,name)+'</div><div class="guide-meta">主要训练：'+g.part+'</div><p><strong>怎么做：</strong>'+g.steps+'</p><p><strong>发力和呼吸：</strong>'+g.cue+'</p><p><strong>避免：</strong>'+g.avoid+'</p><p class="guide-note">示意图为简化方向图，不替代现场动作教学；不适立即停止。</p>';
+  td.append(panel);detail.append(td);tr.after(detail);
+  btn.addEventListener('click',()=>{const open=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',String(!open));detail.hidden=open;});
+ });
+ const wrap=document.createElement('div');wrap.className='stretch-wrap';
+ const toggle=document.createElement('button');toggle.type='button';toggle.className='stretch-toggle';toggle.setAttribute('aria-expanded','false');
+ const id='stretch-'+dayIndex;toggle.setAttribute('aria-controls',id);toggle.innerHTML='<span>🧘 练后拉伸 · 查看指导</span><span class="chev">⌄</span>';
+ const content=document.createElement('div');content.className='stretch-content';content.id=id;content.hidden=true;
+ const tip=document.createElement('p');tip.className='guide-note';tip.textContent='训练后可选做，轻微牵拉感即可；每侧约 20–30 秒 × 2 轮，不要弹震或忍痛拉伸。';content.append(tip);
+ stretches[dayKey].forEach(([name,part,how],i)=>{const item=document.createElement('div');item.className='stretch-item';
+  item.innerHTML='<div class="stretch-inner"><div class="stretch-icon" aria-hidden="true">↗</div><div><div class="stretch-name">'+name+' <span class="muted">· '+part+'</span></div><div class="stretch-text">'+how+'</div><div class="stretch-text">保持 20–30 秒，左右侧各 2 轮（双侧动作做 2 轮）。</div></div></div>';
+  content.append(item);
+ });
+ toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')==='true';toggle.setAttribute('aria-expanded',String(!open));content.hidden=open;});
+ wrap.append(toggle,content);card.querySelector('.dayfooter').before(wrap);
+});
+})();
+</script>
 
 <script>
 /* PWA: 注册 Service Worker；新版本就绪后自动刷新一次（打卡数据存在 localStorage，不受影响） */
